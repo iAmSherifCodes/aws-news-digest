@@ -1,11 +1,8 @@
+import os
+
 def get_category_from_url(posts):
-    """Extract category from AWS blog post URLs and update each post.
-    
-    Args:
-        posts (list): List of post objects with 'url' field
-    """
-    print("Extracting categories from URLs...")
-    base_url = "https://aws.amazon.com/blogs/"
+    base_url = os.environ.get('AWS_BLOGS_BASE_URL', 'https://aws.amazon.com/blogs/')
+    unknown_category = os.environ.get('UNKNOWN_CATEGORY', 'unknown')
     categories = set()
     for post in posts:
         url = post.get('url', '')
@@ -14,5 +11,5 @@ def get_category_from_url(posts):
             post['category'] = category
             categories.add(category)
         else:
-            post['category'] = 'unknown'
+            post['category'] = unknown_category
     return posts, list(categories)
