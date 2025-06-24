@@ -1,0 +1,14 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "suo-aws"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-EXAMPLE"
+s3_prefix = "suo-aws"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Environment=\"dev\""
+image_repositories = ["ScraperFunction=343218220735.dkr.ecr.us-east-1.amazonaws.com/suo-aws-scraper:latest"]
+resolve_s3 = true
+confirm_changeset = true
+disable_rollback = true
