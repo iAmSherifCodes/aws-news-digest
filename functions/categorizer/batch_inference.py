@@ -20,7 +20,7 @@ bedrock = None
 s3 = None
 
 # Bedrock model ID for batch inference
-NOVA_MODEL = "amazon.nova-lite-v1:0"
+NOVA_MODEL = os.environ.get('BEDROCK_MODEL_ID', 'amazon.nova-lite-v1:0')
 
 # S3 configuration
 def get_bucket_name():
@@ -35,7 +35,7 @@ def get_bucket_name():
         return os.environ.get('BATCH_BUCKET', 'aws-news-batch-inference-default')
 
 BUCKET_NAME = get_bucket_name()
-BATCH_PREFIX = 'batch-inference'
+BATCH_PREFIX = os.environ.get('BATCH_PREFIX', 'batch-inference')
 
 # AWS service categories
 AWS_CATEGORIES = [
@@ -233,7 +233,7 @@ def create_service_role():
         sts = boto3.client('sts', AWS_REGION)
         account_id = sts.get_caller_identity()['Account']
         
-        role_name = "AWSNewsBatchInferenceRole"
+        role_name = os.environ.get('BATCH_ROLE_NAME', 'AWSNewsBatchInferenceRole')
         
         # Check if role exists
         try:
