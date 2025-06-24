@@ -3,14 +3,14 @@ const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb')
 const { SNSClient, PublishCommand } = require('@aws-sdk/client-sns');
 const sendEmail = require('./mail_setup').sendEmail;
 
-const client = new DynamoDBClient({ region: 'us-east-1' });
+const client = new DynamoDBClient({ region: process.env.AWS_REGION });
 const dynamodb = DynamoDBDocumentClient.from(client);
-const sns = new SNSClient({ region: 'us-east-1' });
+const sns = new SNSClient({ region: process.env.AWS_REGION });
 
-const POSTS_TABLE = 'suo-aws-posts';
-const USERS_TABLE = 'aws-suo-users';
-const FROM_EMAIL = 'cashgraphicx@gmail.com'; // process.env.FROM_EMAIL || 'cashgraphicx@gmail.com';
-const SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:343218220735:SuoAwsErrorNotifier.fifo';
+const POSTS_TABLE = process.env.POSTS_TABLE;
+const USERS_TABLE = process.env.USERS_TABLE;
+const FROM_EMAIL = process.env.FROM_EMAIL;
+const SNS_TOPIC_ARN = process.env.SNS_TOPIC_ARN;
 
 async function getPostsByDate(date) {
     try {
