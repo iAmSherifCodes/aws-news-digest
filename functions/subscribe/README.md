@@ -2,7 +2,7 @@
 
 This directory contains two approaches for handling user subscriptions:
 
-## 1. Direct API Gateway to DynamoDB Integration (Recommended)
+## 1. Direct API Gateway to DynamoDB Integration
 
 **Files:**
 - `api-gateway-dynamodb.yaml` - CloudFormation template
@@ -44,17 +44,6 @@ Both approaches expose the same API endpoint:
   "subscription_id": "uuid-here",
   "email": "john@example.com"
 }
-```
-
-### Test the API:
-```bash
-curl -X POST https://your-api-endpoint/subscribe \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "name": "John Doe",
-    "email": "john@example.com",
-    "categories": ["AI/ML", "Serverless"]
-  }'
 ```
 
 ## DynamoDB Table Structure
