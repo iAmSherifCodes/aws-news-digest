@@ -1,0 +1,3 @@
+boto3
+aioboto3
+asyncio
