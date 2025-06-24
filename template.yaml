@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SUO-AWS - AWS News Subscription Platform
+
+Globals:
+  Function:
+    Timeout: 60
+    MemorySize: 256
+    Runtime: python3.10
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        AWS_REGION: us-east-1
+        LOG_LEVEL: INFO
+        POSTS_TABLE: !Ref PostsTable
+        USERS_TABLE: !Ref UsersTable
+    Tracing: Active # Enable X-Ray tracing
+
+Resources:
+  # DynamoDB Tables
+  PostsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: suo-aws-posts
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: url
+          AttributeType: S
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: url
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: IdIndex
+          KeySchema:
+            - AttributeName: id
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: suo-aws-users
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: email
+          KeyType: HASH
+
+  # Lambda Layer for common code
+  CommonLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: suo-aws-common-layer
+      Description: Common utilities for SUO-AWS
+      ContentUri: layers/common/
+      CompatibleRuntimes:
+        - python3.10
+    Metadata:
+      BuildMethod: python3.10
+
+  ScraperFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: suo-aws-scraper
+      CodeUri: functions/scraper/
+      Handler: app.lambda_handler
+      Description: Scrape and parse the latest news from AWS blogs
+      MemorySize: 1024
+      Timeout: 600
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PostsTable
+        - CloudWatchLogsFullAccess
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:BatchWriteItem
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+              Resource: !GetAtt PostsTable.Arn
+
+  CategorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/categorizer/
+      Handler: app.lambda_handler
+      Description: Categorizes and summarizes blog posts using Amazon Bedrock
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PostsTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource: '*'
+      Layers:
+        - !Ref CommonLayer
+
+  NotifierFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/notifier/
+      Handler: app.lambda_handler
+      Description: Sends notifications to subscribed users
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref PostsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersTable
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt NewsTopic.TopicName
+      Layers:
+        - !Ref CommonLayer
+
+  # SNS Topic for notifications
+  NewsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: suo-aws-news-notifications
+
+  # Step Functions State Machine
+  NewsProcessingStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: SUO-AWS-NewsProcessing
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ScraperFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref CategorizerFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref NotifierFunction
+      DefinitionUri: statemachine/news_processing.asl.json
+
+  # EventBridge Rule for daily execution
+  DailyExecutionRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: SUO-AWS-DailyExecution
+      Description: Triggers the news processing workflow daily
+      ScheduleExpression: cron(0 8 * * ? *) # 8 AM UTC daily
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt NewsProcessingStateMachine.Arn
+          Id: ProcessNewsTarget
+          RoleArn: !GetAtt StepFunctionsExecutionRole.Arn
+
+  # IAM Role for EventBridge to invoke Step Functions
+  StepFunctionsExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSStepFunctionsInvokeEventsServiceRole
+
+Outputs:
+  PostsTable:
+    Description: DynamoDB table for storing AWS news posts
+    Value: !Ref PostsTable
+  UsersTable:
+    Description: DynamoDB table for storing user subscriptions
+    Value: !Ref UsersTable
+  NewsTopic:
+    Description: SNS topic for news notifications
+    Value: !Ref NewsTopic
+  NewsProcessingStateMachine:
+    Description: Step Functions state machine for news processing
+    Value: !Ref NewsProcessingStateMachine
+  ScraperFunctionArn:
+    Description: ARN of the Scraper Lambda function
+    Value: !GetAtt ScraperFunction.Arn
+  ScraperFunctionUrl:
+    Description: URL of the Scraper Lambda function in the AWS Console
+    Value: !Sub https://console.aws.amazon.com/lambda/home?region=${AWS::Region}#/functions/${ScraperFunction}
