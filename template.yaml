@@ -73,7 +73,7 @@ Resources:
           CATEGORIES_TABLE: !Ref CategoriesTable
           GENAI_MODEL: false
           BATCH_BUCKET: !Ref BatchInferenceBucket
-          BEDROCK_MODEL_ID: amazon.nova-lite-v1:0
+          BEDROCK_MODEL_ID: amazon.nova-pro-v1:0
           BATCH_PREFIX: batch-inference
           BATCH_ROLE_NAME: AWSNewsBatchInferenceRole
           AWS_BLOGS_BASE_URL: https://aws.amazon.com/blogs/
