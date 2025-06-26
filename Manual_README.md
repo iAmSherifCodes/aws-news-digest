@@ -97,6 +97,6 @@ curl -X POST https://90kdndeozk.execute-api.us-east-1.amazonaws.com/dev/start-wo
 
 ## 🙋 Need Help?
 
-If you face issues, please contact the project owner or support team.
+If you face issues, please contact awofiranyesherif4@gmail.com.
 
 ---
