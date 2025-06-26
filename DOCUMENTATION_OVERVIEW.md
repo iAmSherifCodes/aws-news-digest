@@ -34,7 +34,7 @@ SUO-AWS is a serverless AWS news subscription platform that:
 | **Amazon Bedrock** | AI categorization | Nova Lite model |
 | **Amazon S3** | Batch processing | Auto-created buckets |
 | **API Gateway** | REST API | Direct DynamoDB integration |
-| **Amazon SNS** | Error notifications | FIFO topic |
+| **Amazon SNS** | Error notifications |
 
 ### Supporting Services
 - **CloudWatch** - Logging and monitoring
@@ -124,22 +124,6 @@ Each function includes monitoring guidance for:
 - Use DynamoDB Global Tables for multi-region
 - Add CloudFront for API caching
 - Consider Step Functions for complex workflows
-
-## 🔄 Maintenance Tasks
-
-### Regular Maintenance
-- Monitor CloudWatch alarms
-- Review and rotate access keys
-- Update dependencies and runtime versions
-- Archive old blog posts
-- Clean up unused S3 objects
-
-### Quarterly Reviews
-- Analyze cost optimization opportunities
-- Review user engagement metrics
-- Update AWS service category mappings
-- Performance optimization assessment
-- Security audit and updates
 
 ## 📞 Support & Troubleshooting
 
