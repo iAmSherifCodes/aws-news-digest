@@ -107,10 +107,10 @@ Resources:
           POSTS_TABLE: !Ref PostsTable
           USERS_TABLE: !Ref UsersTable
           CATEGORIES_TABLE: !Ref CategoriesTable
-          FROM_EMAIL: cashgraphicx@gmail.com
+          FROM_EMAIL: <your-email-address>
           SNS_TOPIC_ARN: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:SuoAwsErrorNotifier.fifo
           EMAIL_SERVICE: gmail
-          EMAIL_USER: cashgraphicx@gmail.com
+          EMAIL_USER: <your-email-address>
           EMAIL_PASS: <your-email-password>
       Policies:
         - DynamoDBReadPolicy:
