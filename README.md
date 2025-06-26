@@ -109,7 +109,7 @@ The application uses the following environment variables:
 | `USERS_TABLE` | DynamoDB table for users | `aws-suo-users` |
 | `CATEGORIES_TABLE` | DynamoDB table for categories | `suo-categories` |
 | `GENAI_MODEL` | Enable AI categorization | `false` |
-| `BEDROCK_MODEL_ID` | Bedrock model for AI | `amazon.nova-lite-v1:0` |
+| `BEDROCK_MODEL_ID` | Bedrock model for AI | `amazon.nova-pro-v1:0` |
 | `EMAIL_USER` | SMTP username | - |
 | `EMAIL_PASS` | SMTP password | - |
 | `FROM_EMAIL` | Sender email address | - |
@@ -124,8 +124,8 @@ The application uses the following environment variables:
 
 ### 2. **Categorization (Categorizer Function)**
 - **URL-based**: Extracts category from blog URL path
-- **AI-powered**: Uses Amazon Bedrock for intelligent categorization
-- Supports batch processing for multiple posts
+- **AI-powered(IAM issue: Account needed to raise a support ticket for CreateModelInvocationJob Authorization job )**: Uses Amazon Bedrock (Amazon Nova Pro Model) for intelligent categorization
+- Supports batch processing for multiple posts using batch inference
 - Updates posts with category information
 
 ### 3. **Notification (Notifier Function)**
@@ -181,12 +181,12 @@ The application uses the following environment variables:
 
 ### Subscribe to Categories
 ```bash
-curl -X POST https://your-api-gateway-url/prod/subscribe \
+curl -X POST https://pn9va5qd7k.execute-api.us-east-1.amazonaws.com/prod/subscribe \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John Doe",
     "email": "john@example.com", 
-    "categories": ["compute", "ai-ml", "serverless"]
+    "categories": ["compute", "database", "machine-learning"]
   }'
 ```
 
@@ -196,7 +196,7 @@ curl -X POST https://your-api-gateway-url/prod/subscribe \
 ```bash
 aws lambda invoke \
   --function-name suo-aws-scraper \
-  --payload '{"target_date": "12/15/2024"}' \
+  --payload '{"target_date": "06/25/2025"}' \
   response.json
 ```
 
@@ -204,7 +204,7 @@ aws lambda invoke \
 ```bash
 aws lambda invoke \
   --function-name suo-aws-categorizer \
-  --payload '{"date": "12/15/2024"}' \
+  --payload '{"target_date": "06/25/2025"}' \
   response.json
 ```
 
@@ -219,13 +219,11 @@ aws lambda invoke \
 ## 🎯 AWS Service Categories
 
 The system recognizes these AWS service categories:
-- `architecture`, `compute`, `containers`, `serverless`
-- `database`, `storage`, `networking-and-content-delivery`
-- `security`, `machine-learning`, `ai-ml`
-- `analytics`, `big-data`, `business-intelligence`
-- `developer`, `devops`, `mobile`
-- `iot`, `media`, `gaming`
-- And many more...
+- `architecture`, `mt`, `gametech`, `aws-insights`, `awsmarketplace`, `big-data`
+- `compute`, `containers`, `database`, `desktop-and-application-streaming`, `developer`, `devops`, `mobile` 
+- `networking-and-content-delivery`, `opensource`,`machine-learning`, `media`, `quantum-computing`, `robotics`
+- `awsforsap`, `security`, `spatial`, `startups`, `storage`, `supply-chain`, `training-and-certification`
+- And many more ...
 
 ## 🔍 Monitoring & Troubleshooting
 
