@@ -1,4 +1,4 @@
-# 🧪 Manual Testing Guide for News Processing Workflow
+## 🧪 Manual Testing Guide for News Processing Workflow
 
 Welcome to the testing interface for our automated news processing system.  
 This API allows you to manually trigger our workflow which performs:
@@ -9,19 +9,22 @@ This API allows you to manually trigger our workflow which performs:
 
 The workflow normally runs daily, but you can test it manually by sending a request with a specific date.
 
----
+### Prerequisites
+- Ensure that you have subscribed on [SUO-AWS website]()
 
-## 🔗 API Endpoint
+### 🔗 API Endpoint
 
 ```
 POST https://90kdndeozk.execute-api.us-east-1.amazonaws.com/dev/start-workflow
 ```
 
-> Replace the URL with the one provided to you.
+### Test Dates
+ Please note that each of the date cannot be used twice.
+ - `06/23/2025`
+ - `06/24/2025`
+ - `06/25/2025`
 
----
-
-## 📥 Request Body
+### Request Body
 
 The API accepts a JSON body with an optional field:
 
@@ -29,7 +32,7 @@ The API accepts a JSON body with an optional field:
 |--------------|--------|--------------------------------------|
 | `target-date`| string | (Optional) Format: `MM/DD/YYYY`. If not provided, the system defaults to **yesterday**. |
 
-### ✅ Example Payload
+#### Example Payload
 
 ```json
 {
@@ -37,9 +40,7 @@ The API accepts a JSON body with an optional field:
 }
 ```
 
----
-
-## 💻 Test with `curl`
+### Test with `curl`
 
 You can test the API using the terminal:
 
@@ -49,11 +50,8 @@ curl -X POST https://90kdndeozk.execute-api.us-east-1.amazonaws.com/dev/start-wo
   -d '{"target-date": "06/25/2025"}'
 ```
 
-Replace the URL and date as needed.
 
----
-
-## 📫 Test with Postman
+### Test with Postman
 
 1. Open [Postman](https://www.postman.com/)
 
@@ -81,9 +79,7 @@ Replace the URL and date as needed.
 
 6. Click **Send**
 
----
-
-## ✅ Sample Successful Response
+### Sample Successful Response
 
 ```json
 {
@@ -91,11 +87,7 @@ Replace the URL and date as needed.
 }
 ```
 
-You can use the `executionArn` to trace the process if needed (internally).
-
----
-
-## ⚠️ Notes
+### Notes
 
 * The system is case-sensitive. Field must be `target-date`, not `TargetDate` or `targetDate`.
 * Please do not spam or test repeatedly within short time windows.
