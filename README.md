@@ -1,96 +1,252 @@
 # SUO-AWS: AWS News Subscription Platform
 
-A serverless application that automatically scrapes AWS blog announcements, categorizes and summarizes them using AI, and emails subscribed users based on their selected AWS service categories.
+A serverless application that automatically scrapes AWS blog announcements, categorizes them using AI or URL-based logic, and emails subscribed users based on their selected AWS service categories.
 
-## Architecture
+## 🏗️ Architecture Overview
 
-SUO-AWS uses the following AWS services:
+SUO-AWS (Stay Updated On AWS) is built using a serverless architecture with the following AWS services:
 
-- **AWS Lambda** - For running the scraper, categorizer, and notifier functions
-- **Amazon DynamoDB** - For storing blog posts and user subscriptions
-- **Amazon Bedrock** - For AI-powered categorization and summarization
-- **Amazon SNS** - For sending email notifications
-- **AWS Step Functions** - For orchestrating the workflow
-- **Amazon EventBridge** - For scheduling daily execution
+- **AWS Lambda** - Three main functions: scraper, categorizer, and notifier.
+- **Amazon DynamoDB** - Three tables for storing blog posts, user subscriptions, and categories
+- **Amazon Bedrock** - Optional AI-powered categorization and summarization using Nova Pro model
+- **Amazon S3** - Batch inference input/output storage
+- **Amazon SNS** - Error notifications
+- **API Gateway** - Direct integration with DynamoDB for user subscription management
+- **Amazon Step Function** - Orchestrate functions workflow
+- **Amazon EventBridge Scheduler** - Recurring, cron-based scheduler that processes SUO-AWS daily by triggering the step-function workflow every 24 hours.
 
-## Project Structure
+_Disclaimer: The Project structure is the combination of all functions, codes and scripts in one folder for documentation purpose. The SAM template is only used for deploying the Notifier Lambda function._
+
+## 📁 Project Structure
 
 ```
 suo-aws/
-├── layers/
-│   └── common/
-│       ├── python/
-│       │   └── utils.py
-│       └── requirements.txt
 ├── functions/
-│   ├── scraper/
-│   │   ├── app.py
+│   ├── scraper/           # Web scraping AWS blogs
+│   │   ├── app.py         # Main Lambda handler
+│   │   ├── manual_extractor.py  # Playwright-based scraper
 │   │   └── requirements.txt
-│   ├── categorizer/
-│   │   ├── app.py
+│   ├── categorizer/       # AI/URL-based categorization
+│   │   ├── app.py         # Main Lambda handler
+│   │   ├── batch_inference.py   # Bedrock batch processing
+│   │   ├── url_categorizer.py   # URL-based categorization
 │   │   └── requirements.txt
-│   └── notifier/
-│       ├── app.py
-│       └── requirements.txt
-├── statemachine/
-│   └── news_processing.asl.json
-├── template.yaml
+│   ├── notifier/          # Email notifications
+│   │   ├── app.js         # Main Lambda handler (Node.js)
+│   │   ├── mail_setup.js  # Email configuration
+│   │   └── package.json
+│   └── subscribe/         # User subscription API
+│       ├── api-gateway-dynamodb.yaml
+│       └── deploy-direct-integration.sh
+├── template.yaml          # SAM template
+├── samconfig.toml         # SAM configuration
 └── README.md
 ```
 
-## Deployment
+## 🚀 Deployment
 
 ### Prerequisites
 
 - AWS SAM CLI installed
 - AWS CLI configured with appropriate credentials
-- Python 3.10 installed
+- Python 3.10+ installed
+- Node.js 18+ installed
+- Docker
 
-### Steps
+### Quick Start
 
-1. Clone the repository
-2. Navigate to the project directory
-3. Build the SAM application:
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd suo-aws
+   ```
 
-```bash
-sam build
+2. **Install Playwright dependencies (for scraper)**
+   ```bash
+   cd functions/scraper
+   pip install playwright
+   playwright install chromium
+   cd ../..
+   ```
+
+3. **Build the SAM application**
+   ```bash
+   sam build
+   ```
+
+4. **Deploy the application**
+   ```bash
+   sam deploy --guided
+   ```
+
+5. **Deploy the subscription API (optional)**
+   ```bash
+   cd functions/subscribe
+   ./deploy-direct-integration.sh
+   ```
+
+### Environment Variables
+
+The application uses the following environment variables:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `POSTS_TABLE` | DynamoDB table for blog posts | `suo-aws-posts` |
+| `USERS_TABLE` | DynamoDB table for users | `aws-suo-users` |
+| `CATEGORIES_TABLE` | DynamoDB table for categories | `suo-categories` |
+| `GENAI_MODEL` | Enable AI categorization | `false` |
+| `BEDROCK_MODEL_ID` | Bedrock model for AI | `amazon.nova-lite-v1:0` |
+| `EMAIL_USER` | SMTP username | - |
+| `EMAIL_PASS` | SMTP password | - |
+| `FROM_EMAIL` | Sender email address | - |
+
+## 🔧 How It Works
+
+### 1. **Web Scraping (Scraper Function)**
+- Uses Playwright to scrape AWS blogs
+- Extracts posts for a specific date (default: previous day)
+- Stores raw blog post data in DynamoDB
+- Handles pagination and dynamic content loading
+
+### 2. **Categorization (Categorizer Function)**
+- **URL-based**: Extracts category from blog URL path
+- **AI-powered**: Uses Amazon Bedrock for intelligent categorization
+- Supports batch processing for multiple posts
+- Updates posts with category information
+
+### 3. **Notification (Notifier Function)**
+- Retrieves categorized posts for a date
+- Matches posts with user subscriptions
+- Sends personalized emails using SMTP
+- Handles error notifications via SNS
+
+### 4. **Subscription Management**
+- Direct API Gateway to DynamoDB integration
+- RESTful API for user subscription management
+- Input validation and CORS support
+
+## 📊 Database Schema
+
+### Posts Table (`suo-aws-posts`)
+```json
+{
+  "id": "string (UUID)",
+  "title": "string",
+  "url": "string", 
+  "author": "string",
+  "date": "string (MM/DD/YYYY)",
+  "description": "string",
+  "category": "string",
+  "summary": "string (optional)",
+  "processed": "boolean"
+}
 ```
 
-4. Deploy the application:
-
-```bash
-sam deploy --guided
+### Users Table (`aws-suo-users`)
+```json
+{
+  "id": "string (UUID)",
+  "email": "string",
+  "name": "string",
+  "categories": ["string"],
+  "active": "boolean",
+  "created_at": "string"
+}
 ```
 
-5. Follow the prompts to complete the deployment
-
-## Usage
-
-### Adding Users
-
-To add users to the subscription system, you can use the AWS CLI or AWS Console to add items to the DynamoDB users table:
-
-```bash
-aws dynamodb put-item \
-    --table-name suo-aws-users \
-    --item '{
-        "email": {"S": "user@example.com"},
-        "name": {"S": "John Doe"},
-        "subscribed_categories": {"SS": ["Compute", "AI/ML", "Serverless"]}
-    }'
+### Categories Table (`suo-categories`)
+```json
+{
+  "id": "string (UUID)",
+  "date": "string (MM/DD/YYYY)",
+  "categories": ["string"]
+}
 ```
 
-### Testing the Workflow
+## 🔌 API Usage
 
-You can manually trigger the Step Functions workflow using the AWS Console or AWS CLI:
-
+### Subscribe to Categories
 ```bash
-aws stepfunctions start-execution \
-    --state-machine-arn <state-machine-arn> \
-    --input '{}'
+curl -X POST https://your-api-gateway-url/prod/subscribe \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com", 
+    "categories": ["compute", "ai-ml", "serverless"]
+  }'
 ```
 
-## License
+### Manual Function Invocation
 
-This project is licensed under the MIT License - see the LICENSE file for details.# aws-news-digest
-# aws-news-digest
+**Scraper Function:**
+```bash
+aws lambda invoke \
+  --function-name suo-aws-scraper \
+  --payload '{"target_date": "12/15/2024"}' \
+  response.json
+```
+
+**Categorizer Function:**
+```bash
+aws lambda invoke \
+  --function-name suo-aws-categorizer \
+  --payload '{"date": "12/15/2024"}' \
+  response.json
+```
+
+**Notifier Function:**
+```bash
+aws lambda invoke \
+  --function-name suo-aws-notifier \
+  --payload '{}' \
+  response.json
+```
+
+## 🎯 AWS Service Categories
+
+The system recognizes these AWS service categories:
+- `architecture`, `compute`, `containers`, `serverless`
+- `database`, `storage`, `networking-and-content-delivery`
+- `security`, `machine-learning`, `ai-ml`
+- `analytics`, `big-data`, `business-intelligence`
+- `developer`, `devops`, `mobile`
+- `iot`, `media`, `gaming`
+- And many more...
+
+## 🔍 Monitoring & Troubleshooting
+
+### CloudWatch Logs
+- Each Lambda function creates its own log group
+- Log levels can be controlled via `LOG_LEVEL` environment variable
+
+### Error Handling
+- SNS notifications for critical errors
+- Comprehensive error logging
+- Graceful degradation for non-critical failures
+
+### Performance Optimization
+- DynamoDB on-demand billing
+- Lambda memory optimization (128MB default)
+- Batch processing for AI operations
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🔗 Repository
+
+**Public Repository URL:** https://github.com/cashgraphicx/suo-aws-news-platform
+
+> **Note:** Replace with your actual public repository URL after pushing to GitHub
+
+---
+
+*Built with ❤️ using AWS Serverless technologies*
