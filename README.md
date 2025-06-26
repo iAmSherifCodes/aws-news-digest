@@ -15,6 +15,10 @@ SUO-AWS (Stay Updated On AWS) is built using a serverless architecture with the 
 - **Amazon Step Function** - Orchestrate functions workflow
 - **Amazon EventBridge Scheduler** - Recurring, cron-based scheduler that processes SUO-AWS daily by triggering the step-function workflow every 24 hours.
 - **Amazon Q** - Documentation and Scripting.
+ 
+## Manaul Testing
+ Please refer to the README.md file below
+- **[./Manual_README.md](./Manual_README.md)** - Web scraping function using Playwright
 
 
 ## 📁 Project Structure
