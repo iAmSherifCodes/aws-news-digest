@@ -1,132 +1,95 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: SUO-AWS - AWS News Subscription Platform
-
-Globals:
-  Function:
-    Timeout: 60
-    MemorySize: 128
-    Architectures:
-      - x86_64
-    Environment:
-      Variables:
-        AWS_REGION: us-east-1
-        LOG_LEVEL: INFO
-
+Description: An AWS Serverless Application Model template describing your function.
 Resources:
-  # DynamoDB Tables
-  PostsTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: suo-aws-posts
-      BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        - AttributeName: id
-          AttributeType: S
-      KeySchema:
-        - AttributeName: id
-          KeyType: HASH
-
-  UsersTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: aws-suo-users
-      BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        - AttributeName: email
-          AttributeType: S
-      KeySchema:
-        - AttributeName: email
-          KeyType: HASH
-
-  CategoriesTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: suo-categories
-      BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        - AttributeName: id
-          AttributeType: S
-      KeySchema:
-        - AttributeName: id
-          KeyType: HASH
-
-  # S3 Bucket for batch inference
-  BatchInferenceBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub aws-news-batch-inference-${AWS::AccountId}
-
-  # Lambda Functions
-  CategorizerFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: suo-aws-categorizer
-      CodeUri: functions/categorizer/
-      Handler: app.lambda_handler
-      Runtime: python3.10
-      MemorySize: 128
-      Timeout: 30
-      Environment:
-        Variables:
-          POSTS_TABLE: !Ref PostsTable
-          CATEGORIES_TABLE: !Ref CategoriesTable
-          GENAI_MODEL: false
-          BATCH_BUCKET: !Ref BatchInferenceBucket
-          BEDROCK_MODEL_ID: amazon.nova-pro-v1:0
-          BATCH_PREFIX: batch-inference
-          BATCH_ROLE_NAME: AWSNewsBatchInferenceRole
-          AWS_BLOGS_BASE_URL: https://aws.amazon.com/blogs/
-          UNKNOWN_CATEGORY: unknown
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref PostsTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref CategoriesTable
-        - Statement:
-            - Effect: Allow
-              Action:
-                - bedrock:*
-                - s3:*
-                - iam:CreateRole
-                - iam:GetRole
-                - iam:PutRolePolicy
-                - iam:PassRole
-                - sts:GetCallerIdentity
-              Resource: '*'
-
   NotifierFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: suo-aws-notifier
-      CodeUri: functions/notifier/
+      CodeUri: .
+      Description: ''
+      MemorySize: 128
+      Timeout: 120
       Handler: app.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
       Environment:
         Variables:
-          POSTS_TABLE: !Ref PostsTable
-          USERS_TABLE: !Ref UsersTable
-          CATEGORIES_TABLE: !Ref CategoriesTable
+          CATEGORIES_TABLE: suo-categories
           FROM_EMAIL: <your-email-address>
-          SNS_TOPIC_ARN: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:SuoAwsErrorNotifier.fifo
-          EMAIL_SERVICE: gmail
-          EMAIL_USER: <your-email-address>
-          EMAIL_PASS: <your-email-password>
+          POSTS_TABLE: suo-aws-posts
+          SNS_TOPIC_ARN: ''
+          USERS_TABLE: aws-suo-users
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 21600
+        MaximumRetryAttempts: 2
+      PackageType: Zip
       Policies:
-        - DynamoDBReadPolicy:
-            TableName: !Ref PostsTable
-        - DynamoDBReadPolicy:
-            TableName: !Ref UsersTable
-        - DynamoDBReadPolicy:
-            TableName: !Ref CategoriesTable
         - Statement:
+            - Action:
+                - dynamodb:GetItem
+                - dynamodb:DeleteItem
+                - dynamodb:PutItem
+                - dynamodb:Scan
+                - dynamodb:Query
+                - dynamodb:UpdateItem
+                - dynamodb:BatchWriteItem
+                - dynamodb:BatchGetItem
+                - dynamodb:DescribeTable
+                - dynamodb:ConditionCheckItem
+              Resource:
+                - arn:aws:dynamodb:<your-region>:<your-account-id>:table/suo-aws-posts
+                - >-
+                  arn:aws:dynamodb:<your-region>:<your-account-id>:table/suo-aws-posts/index/*
+              Effect: Allow
+            - Action:
+                - dynamodb:GetItem
+                - dynamodb:DeleteItem
+                - dynamodb:PutItem
+                - dynamodb:Scan
+                - dynamodb:Query
+                - dynamodb:UpdateItem
+                - dynamodb:BatchWriteItem
+                - dynamodb:BatchGetItem
+                - dynamodb:DescribeTable
+                - dynamodb:ConditionCheckItem
+              Resource:
+                - arn:aws:dynamodb:<your-region>:<your-account-id>:table/suo-categories
+                - >-
+                  arn:aws:dynamodb:<your-region>:<your-account-id>:table/suo-categories/index/*
+              Effect: Allow
+            - Action:
+                - dynamodb:GetItem
+                - dynamodb:DeleteItem
+                - dynamodb:PutItem
+                - dynamodb:Scan
+                - dynamodb:Query
+                - dynamodb:UpdateItem
+                - dynamodb:BatchWriteItem
+                - dynamodb:BatchGetItem
+                - dynamodb:DescribeTable
+                - dynamodb:ConditionCheckItem
+              Resource:
+                - arn:aws:dynamodb:<your-region>:<your-account-id>:table/aws-suo-users
+                - >-
+                  arn:aws:dynamodb:<your-region>:<your-account-id>:table/aws-suo-users/index/*
+              Effect: Allow
+            - Action:
+                - sns:Publish
+              Resource: 'arn:aws:sns:<your-region>:<your-account-id>:'
+              Effect: Allow
             - Effect: Allow
               Action:
-                - sns:Publish
-              Resource: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:SuoAwsErrorNotifier.fifo
-
-Outputs:
-  CategorizerFunctionArn:
-    Value: !GetAtt CategorizerFunction.Arn
-  NotifierFunctionArn:
-    Value: !GetAtt NotifierFunction.Arn
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+      RecursiveLoop: Terminate
+      SnapStart:
+        ApplyOn: None
+      Tags:
+        lambda:createdBy: SAM
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
