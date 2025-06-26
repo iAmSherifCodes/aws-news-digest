@@ -41,8 +41,7 @@ Resources:
                 - dynamodb:ConditionCheckItem
               Resource:
                 - arn:aws:dynamodb:<your-region>:<your-account-id>:table/suo-aws-posts
-                - >-
-                  arn:aws:dynamodb:<your-region>:<your-account-id>:table/suo-aws-posts/index/*
+                - arn:aws:dynamodb:<your-region>:<your-account-id>:table/suo-aws-posts/index/*
               Effect: Allow
             - Action:
                 - dynamodb:GetItem
@@ -57,8 +56,7 @@ Resources:
                 - dynamodb:ConditionCheckItem
               Resource:
                 - arn:aws:dynamodb:<your-region>:<your-account-id>:table/suo-categories
-                - >-
-                  arn:aws:dynamodb:<your-region>:<your-account-id>:table/suo-categories/index/*
+                - arn:aws:dynamodb:<your-region>:<your-account-id>:table/suo-categories/index/*
               Effect: Allow
             - Action:
                 - dynamodb:GetItem
@@ -73,8 +71,7 @@ Resources:
                 - dynamodb:ConditionCheckItem
               Resource:
                 - arn:aws:dynamodb:<your-region>:<your-account-id>:table/aws-suo-users
-                - >-
-                  arn:aws:dynamodb:<your-region>:<your-account-id>:table/aws-suo-users/index/*
+                - arn:aws:dynamodb:<your-region>:<your-account-id>:table/aws-suo-users/index/*
               Effect: Allow
             - Action:
                 - sns:Publish
