@@ -2,7 +2,7 @@
 
 # Set variables
 ECR_REGION="us-east-1"
-ECR_ACCOUNT_ID="343218220735"
+ECR_ACCOUNT_ID=<your-account-id>  # Replace with your AWS account ID
 ECR_REPOSITORY_NAME="container-playwright"
 IMAGE_TAG="latest"
 IMAGE_URI="$ECR_ACCOUNT_ID.dkr.ecr.$ECR_REGION.amazonaws.com/$ECR_REPOSITORY_NAME:$IMAGE_TAG"
