@@ -39,53 +39,8 @@ SUO-AWS is a serverless AWS news subscription platform that:
 ### Supporting Services
 - **CloudWatch** - Logging and monitoring
 - **IAM** - Permissions and roles
-- **SES/SMTP** - Email delivery
+- **SMTP** - Email delivery
 - **EventBridge** - Scheduling (optional)
-
-## 🚀 Quick Start Guide
-
-### 1. Prerequisites
-```bash
-# Install required tools
-npm install -g aws-sam-cli
-pip install playwright
-playwright install chromium
-```
-
-### 2. Deploy Infrastructure
-```bash
-# Build and deploy
-sam build
-sam deploy --guided
-
-# Deploy subscription API (optional)
-cd functions/subscribe
-./deploy-direct-integration.sh
-```
-
-### 3. Configure Email
-```bash
-# Set email credentials
-aws lambda update-function-configuration \
-  --function-name suo-aws-notifier \
-  --environment Variables='{
-    EMAIL_USER=your-email@gmail.com,
-    EMAIL_PASS=your-app-password,
-    FROM_EMAIL=your-email@gmail.com
-  }'
-```
-
-### 4. Test Functions
-```bash
-# Test scraper
-aws lambda invoke --function-name suo-aws-scraper --payload '{}' response.json
-
-# Test categorizer  
-aws lambda invoke --function-name suo-aws-categorizer --payload '{}' response.json
-
-# Test notifier
-aws lambda invoke --function-name suo-aws-notifier --payload '{}' response.json
-```
 
 ## 📊 Function Details
 
@@ -125,28 +80,6 @@ Each function includes monitoring guidance for:
 - Resource utilization
 - Custom business metrics
 
-### Common Issues & Solutions
-
-**Scraper Issues:**
-- Browser initialization failures → Increase memory
-- Timeout errors → Check network connectivity
-- Missing posts → Verify date format and URL patterns
-
-**Categorizer Issues:**
-- AI model access → Check Bedrock permissions
-- Batch job failures → Review S3 bucket permissions
-- URL categorization → Update category mappings
-
-**Notifier Issues:**
-- Email delivery failures → Verify SMTP credentials
-- No emails sent → Check user subscription data
-- Template errors → Review HTML/text formatting
-
-**API Issues:**
-- CORS errors → Verify OPTIONS method deployment
-- Validation errors → Check JSON schema compliance
-- DynamoDB errors → Review IAM permissions
-
 ## 💰 Cost Optimization
 
 ### Estimated Monthly Costs (100 daily posts, 1000 users)
@@ -164,22 +97,6 @@ Each function includes monitoring guidance for:
 - Optimize Lambda memory allocation
 - Use reserved capacity for predictable workloads
 
-## 🔒 Security Best Practices
-
-### Implemented Security
-- IAM roles with least privilege
-- Input validation and sanitization
-- HTTPS-only API endpoints
-- Encrypted data at rest (DynamoDB)
-- VTL template injection prevention
-
-### Additional Recommendations
-- Store email credentials in Secrets Manager
-- Implement API rate limiting
-- Add WAF protection for public APIs
-- Enable CloudTrail for audit logging
-- Use VPC endpoints for internal communication
-
 ## 🚀 Deployment Environments
 
 ### Development
@@ -189,7 +106,7 @@ Each function includes monitoring guidance for:
 - Manual testing workflows
 
 ### Production
-- Multi-region deployment (optional)
+- Multi-region deployment
 - Optimized resource allocation
 - Error alerting configured
 - Automated testing and deployment
