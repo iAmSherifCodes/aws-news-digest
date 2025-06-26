@@ -14,10 +14,12 @@ SUO-AWS (Stay Updated On AWS) is built using a serverless architecture with the 
 - **API Gateway** - Direct integration with DynamoDB for user subscription management
 - **Amazon Step Function** - Orchestrate functions workflow
 - **Amazon EventBridge Scheduler** - Recurring, cron-based scheduler that processes SUO-AWS daily by triggering the step-function workflow every 24 hours.
+- **Amazon Q** - Documentation and Scripting.
 
-_Note: The Project structure is the combination of all functions, codes and scripts in one folder for documentation purpose. The SAM template is only used for deploying the Notifier Lambda function._
 
 ## 📁 Project Structure
+
+> **Note:** The Project structure is the combination of all functions, codes and scripts in one folder for documentation purpose. The SAM template is only used for deploying the Notifier Lambda function.
 
 ```
 suo-aws/
@@ -255,9 +257,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🔗 Repository
 
-**Public Repository URL:** https://github.com/cashgraphicx/suo-aws-news-platform
-
-> **Note:** Replace with your actual public repository URL after pushing to GitHub
+**Public Repository URL:** https://github.com/iAmSherifCodes/suo-aws.git
 
 ---
 
