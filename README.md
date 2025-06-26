@@ -17,8 +17,8 @@ SUO-AWS (Stay Updated On AWS) is built using a serverless architecture with the 
 - **Amazon Q** - Documentation and Scripting.
  
 ## Manaul Testing
- Please refer to the README.md file below
-- **[./Manual_README.md](./Manual_README.md)** - Web scraping function using Playwright
+ Please refer to the README.md file
+- **[./Manual_README.md](./Manual_README.md)** - Manual Testing guide
 
 
 ## 📁 Project Structure
