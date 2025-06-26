@@ -30,6 +30,7 @@ async function getPostsByDate(date) {
         throw error;
     }
 }
+
 async function getSubscribedUsers(categories) {
     try {
         const response = await dynamodb.send(new ScanCommand({
@@ -138,7 +139,7 @@ async function sendCategorizedNewsToSubscribers(posts, subscribers) {
         await sendEmail('SUO AWS NEWS', FROM_EMAIL, subscriber.name, subscriber.email, subject, text, html)
         }
     }
-  }
+}
 
 function getPreviousDate() {
     const yesterday = new Date();
@@ -149,7 +150,7 @@ function getPreviousDate() {
     const yyyy = yesterday.getFullYear();
   
     return `${mm}/${dd}/${yyyy}`;
-  }
+}
   
   
 exports.handler = async (event, context) => {
@@ -190,10 +191,3 @@ exports.handler = async (event, context) => {
     }
 };
 
-// For local testing
-if (require.main === module) {
-    const testEvent = {
-        post_id: '670729a3-71dd-4519-8719-ee201a1812b2'
-    };
-    exports.handler(testEvent, null).then(console.log);
-}
