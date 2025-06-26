@@ -35,6 +35,9 @@ SUO-AWS is a serverless AWS news subscription platform that:
 | **Amazon S3** | Batch processing | Auto-created buckets |
 | **API Gateway** | REST API | Direct DynamoDB integration |
 | **Amazon SNS** | Error notifications |
+| **Amazon Step Function** | Orchestrate functions workflow  | 
+| **Amazon EventBridge Scheduler** | Recurring, cron-based daily scheduler  | 
+| **Amazon Q** | Documentation and Scripting.  | 
 
 ### Supporting Services
 - **CloudWatch** - Logging and monitoring
