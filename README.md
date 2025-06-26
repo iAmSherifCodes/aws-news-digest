@@ -68,30 +68,32 @@ suo-aws/
    playwright install chromium
    cd ../..
    ```
-5. **Deploy the scraper function**
+3. **Deploy the scraper function**
    ```bash
-   cd functions/scraper
-   chmod +x create_iam_role.sh
-   ./deploy-direct-integration.sh
+    cd functions/scraper
+    chmod +x create_iam_role.sh
+    ./create_iam_role.sh
+    chmod +x deploy.sh
+    ./deploy.sh
    ```
 
-3. **Build the SAM application**
+4. **Build the SAM application**
    ```bash
    sam build
    ```
 
-4. **Deploy the application**
+5. **Deploy the application**
    ```bash
    sam deploy --guided
    ```
 
-5. **Deploy the subscription API (optional)**
+6. **Deploy the subscription API (optional)**
    ```bash
    cd functions/subscribe
    ./deploy-direct-integration.sh
    ```
   
-6. **Deploy the Categorizer Function directly from the Console**
+7. **Deploy the Categorizer Function directly from the Console**
    ```bash
    cd functions/categorizer
    ./deploy-direct-integration.sh
