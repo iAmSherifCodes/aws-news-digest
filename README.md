@@ -15,7 +15,7 @@ SUO-AWS (Stay Updated On AWS) is built using a serverless architecture with the 
 - **Amazon Step Function** - Orchestrate functions workflow
 - **Amazon EventBridge Scheduler** - Recurring, cron-based scheduler that processes SUO-AWS daily by triggering the step-function workflow every 24 hours.
 
-_Disclaimer: The Project structure is the combination of all functions, codes and scripts in one folder for documentation purpose. The SAM template is only used for deploying the Notifier Lambda function._
+_Note: The Project structure is the combination of all functions, codes and scripts in one folder for documentation purpose. The SAM template is only used for deploying the Notifier Lambda function._
 
 ## 📁 Project Structure
 
@@ -57,7 +57,7 @@ suo-aws/
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/iAmSherifCodes/suo-aws.git
    cd suo-aws
    ```
 
@@ -80,6 +80,12 @@ suo-aws/
    ```
 
 5. **Deploy the subscription API (optional)**
+   ```bash
+   cd functions/subscribe
+   ./deploy-direct-integration.sh
+   ```
+  
+6. **Deploy the Categorizer Function API (optional)**
    ```bash
    cd functions/subscribe
    ./deploy-direct-integration.sh
