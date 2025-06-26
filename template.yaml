@@ -4,8 +4,8 @@ Description: SUO-AWS - AWS News Subscription Platform
 
 Globals:
   Function:
-    Timeout: 300
-    MemorySize: 512
+    Timeout: 60
+    MemorySize: 128
     Architectures:
       - x86_64
     Environment:
@@ -65,8 +65,8 @@ Resources:
       CodeUri: functions/categorizer/
       Handler: app.lambda_handler
       Runtime: python3.10
-      MemorySize: 1024
-      Timeout: 900
+      MemorySize: 128
+      Timeout: 30
       Environment:
         Variables:
           POSTS_TABLE: !Ref PostsTable
@@ -101,7 +101,7 @@ Resources:
       FunctionName: suo-aws-notifier
       CodeUri: functions/notifier/
       Handler: app.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs20.x
       Environment:
         Variables:
           POSTS_TABLE: !Ref PostsTable
