@@ -227,19 +227,4 @@ def lambda_handler(event, context):
             'statusCode': 500,
             'body': json.dumps({'message': f'Error processing post: {str(e)}'})
         }
-    
-# For local testing  
-if __name__ == "__main__":
-    # Test with a specific post ID
-    # test_event_single = {
-    #     'post_id': '09de2dd9-6414-48ed-8366-203160430b91'
-    # }
-    # print("Testing with single post ID:")
-    # print(lambda_handler(test_event_single, None))
-    
-    # Test with a date
-    test_event_date = {
-        'date': '06/19/2025'  # Example date format
-    }
-    print("\nTesting with date:")
-    print(lambda_handler(test_event_date, None))
+
