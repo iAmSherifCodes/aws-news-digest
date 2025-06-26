@@ -1,0 +1,245 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: API Gateway direct integration with DynamoDB for subscription service
+
+Parameters:
+  DynamoDBTableName:
+    Type: String
+    Default: aws-suo-users
+    Description: Name of the DynamoDB table for user subscriptions
+
+Resources:
+  # DynamoDB Table
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref DynamoDBTableName
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: email-index
+          KeySchema:
+            - AttributeName: email
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  # IAM Role for API Gateway to access DynamoDB
+  ApiGatewayDynamoDBRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                Resource:
+                  - !GetAtt UsersTable.Arn
+                  - !Sub ${UsersTable.Arn}/index/*
+
+  # API Gateway REST API
+  SubscriptionAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: SubscriptionAPI
+      Description: API for managing user subscriptions
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  # API Gateway Resource
+  SubscribeResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref SubscriptionAPI
+      ParentId: !GetAtt SubscriptionAPI.RootResourceId
+      PathPart: subscribe
+
+  # Request Validator
+  RequestValidator:
+    Type: AWS::ApiGateway::RequestValidator
+    Properties:
+      RestApiId: !Ref SubscriptionAPI
+      Name: RequestValidator
+      ValidateRequestBody: true
+      ValidateRequestParameters: true
+
+  # Request Model
+  SubscriptionModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      RestApiId: !Ref SubscriptionAPI
+      Name: SubscriptionModel
+      ContentType: application/json
+      Schema:
+        $schema: http://json-schema.org/draft-04/schema#
+        type: object
+        properties:
+          name:
+            type: string
+            minLength: 1
+          email:
+            type: string
+            pattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
+          categories:
+            type: array
+            items:
+              type: string
+            minItems: 1
+        required:
+          - name
+          - email
+          - categories
+        additionalProperties: false
+
+  # POST Method
+  SubscribeMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SubscriptionAPI
+      ResourceId: !Ref SubscribeResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      RequestValidatorId: !Ref RequestValidator
+      RequestModels:
+        application/json: !Ref SubscriptionModel
+      Integration:
+        Type: AWS
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:dynamodb:action/PutItem
+        Credentials: !GetAtt ApiGatewayDynamoDBRole.Arn
+        RequestTemplates:
+          application/json: !Sub |
+            {
+              "TableName": "${DynamoDBTableName}",
+              "Item": {
+                "id": {
+                  "S": "$context.requestId"
+                },
+                "name": {
+                  "S": "$input.path('$.name')"
+                },
+                "email": {
+                  "S": "$input.path('$.email')"
+                },
+                "categories": {
+                  "SS": [
+                    #foreach($category in $input.path('$.categories'))
+                      "$category"#if($foreach.hasNext),#end
+                    #end
+                  ]
+                },
+                "created_at": {
+                  "S": "$context.requestTime"
+                },
+                "active": {
+                  "BOOL": true
+                }
+              }
+            }
+        IntegrationResponses:
+          - StatusCode: 201
+            ResponseTemplates:
+              application/json: |
+                {
+                  "message": "Subscription created successfully",
+                  "subscription_id": "$context.requestId",
+                  "email": "$input.path('$.email')"
+                }
+          - StatusCode: 400
+            SelectionPattern: 4\d{2}
+            ResponseTemplates:
+              application/json: |
+                {
+                  "error": "Bad Request",
+                  "message": "Invalid request data"
+                }
+          - StatusCode: 500
+            SelectionPattern: 5\d{2}
+            ResponseTemplates:
+              application/json: |
+                {
+                  "error": "Internal Server Error",
+                  "message": "Failed to create subscription"
+                }
+      MethodResponses:
+        - StatusCode: 201
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+        - StatusCode: 400
+          ResponseModels:
+            application/json: Empty
+        - StatusCode: 500
+          ResponseModels:
+            application/json: Empty
+
+  # OPTIONS Method for CORS
+  SubscribeOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SubscriptionAPI
+      ResourceId: !Ref SubscribeResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+              method.response.header.Access-Control-Allow-Methods: '''POST,OPTIONS'''
+              method.response.header.Access-Control-Allow-Origin: '''*'''
+            ResponseTemplates:
+              application/json: ''
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
+
+  # API Gateway Deployment
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - SubscribeMethod
+      - SubscribeOptionsMethod
+    Properties:
+      RestApiId: !Ref SubscriptionAPI
+      StageName: prod
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub https://${SubscriptionAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/subscribe
+    Export:
+      Name: !Sub ${AWS::StackName}-ApiEndpoint
+
+  DynamoDBTableName:
+    Description: DynamoDB table name
+    Value: !Ref UsersTable
+    Export:
+      Name: !Sub ${AWS::StackName}-TableName
