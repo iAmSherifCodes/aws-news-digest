@@ -157,7 +157,10 @@ exports.handler = async (event, context) => {
     console.log('Starting notification process');
     
     try {
-        const date = getPreviousDate();
+        let date = event.target_date;
+        if (!date) {
+            date = getPreviousDate();
+        }
         console.log('Fetching posts for date:', date);
         
         const posts = await getPostsByDate(date);       
