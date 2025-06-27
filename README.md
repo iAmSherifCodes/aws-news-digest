@@ -41,9 +41,8 @@ suo-aws/
 │   │   ├── app.js         # Main Lambda handler (Node.js)
 │   │   ├── mail_setup.js  # Email configuration
 │   │   └── package.json
-│   └── subscribe/         # User subscription API
-│       ├── api-gateway-dynamodb.yaml
-│       └── deploy-direct-integration.sh
+│   └── subscription/         # User subscription API
+│       └── app.js
 ├── template.yaml          # SAM template
 ├── samconfig.toml         # SAM configuration
 └── README.md
@@ -247,13 +246,6 @@ The system recognizes these AWS service categories:
 - Lambda memory optimization (128MB default)
 - Batch processing for AI operations
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
 
 ## 📄 License
 
