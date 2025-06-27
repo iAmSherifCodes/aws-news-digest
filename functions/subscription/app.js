@@ -26,7 +26,7 @@ function validateInput(event) {
 
 exports.handler = async (event) => {
     try {
-        const { name, email, categories } = validateInput(event);
+        const { name, email, categories } = validateInput(JSON.parse(event.body));
         
         const existingUser = await dynamodb.send(new ScanCommand({
             TableName: USERS_TABLE,
