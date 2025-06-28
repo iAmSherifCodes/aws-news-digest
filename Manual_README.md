@@ -20,12 +20,9 @@ POST https://90kdndeozk.execute-api.us-east-1.amazonaws.com/dev/start-workflow
 
 ### Request Body
 
-The API accepts a JSON body with an optional field:
+The API accepts an empty JSON body.
+By default, the system processes news from yesterday, ensuring that subscribed users receive updates from the previous day.
 
-| Field        | Type   | Description                          |
-|--------------|--------|--------------------------------------|
-| `target_date`| string | (Optional) Format: `MM/DD/YYYY`. If not provided, the system defaults to **yesterday**. |
-> Note: The `target_date` value should the present date or day before. 
 #### Example Payload
 
 ```json
