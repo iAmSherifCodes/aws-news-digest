@@ -2,10 +2,6 @@
 
 A serverless application that automatically scrapes AWS blog announcements, categorizes them using AI or URL-based logic, and emails subscribed users based on their selected AWS service categories.
 
-## Architecture Diagram
-
-![Architecture Diagram](<suo-aws.drawio (2)-1.png>)
-
 ## 🏗️ Architecture Overview
 
 SUO-AWS (Stay Updated On AWS) is built using a serverless architecture with the following AWS services:
