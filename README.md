@@ -1,6 +1,6 @@
 # SUO-AWS: AWS News Subscription Platform
 
-A serverless application that automatically scrapes AWS blog announcements, categorizes them using AI or URL-based logic, and emails subscribed users based on their selected AWS service categories.
+SUO-AWS is a serverless application that keeps curious minds in the loop with the latest updates, service news, and insights they care about from AWS, automatically and effortlessly.
 
 ## Architecture Diagram
 
@@ -11,24 +11,23 @@ A serverless application that automatically scrapes AWS blog announcements, cate
 
 SUO-AWS (Stay Updated On AWS) is built using a serverless architecture with the following AWS services:
 
-- **AWS Lambda** - Three main functions: scraper, categorizer, and notifier.
+- **AWS Lambda** - Four main functions: scraper, categorizer, notifier and subscriber.
 - **Amazon DynamoDB** - Three tables for storing blog posts, user subscriptions, and categories
 - **Amazon Bedrock** - Optional AI-powered categorization and summarization using Nova Pro model
 - **Amazon S3** - Batch inference input/output storage
 - **Amazon SNS** - Error notifications
-- **API Gateway** - Direct integration with DynamoDB for user subscription management
+- **API Gateway** - For testing purpose, Triggers Step-Function StartExecution state.
 - **Amazon Step Function** - Orchestrate functions workflow
 - **Amazon EventBridge Scheduler** - Recurring, cron-based scheduler that processes SUO-AWS daily by triggering the step-function workflow every 24 hours.
 - **Amazon Q** - Documentation and Scripting.
  
-## Manaul Testing
+## Manual Testing
  Please refer to the README.md file
-- **[./Manual_README.md](./Manual_README.md)** - Manual Testing guide
-
+- **[TEST ReadMe file](./Test_README.md)** - Manual Testing guide
 
 ## 📁 Project Structure
 
-> **Note:** The Project structure is the combination of all functions, codes and scripts in one folder for documentation purpose. The SAM template is only used for deploying the Notifier Lambda function.
+> **Note:** The Project structure is the combination of all functions, codes and scripts in one folder for documentation purpose. The SAM template is only used for deploying the Notifier Lambda function. Some functions are deployed using AWS CLI and some directly from the Console.
 
 ```
 suo-aws/
@@ -49,8 +48,9 @@ suo-aws/
 │   └── subscription/         # User subscription API
 │       └── app.js
 ├── template.yaml          # SAM template
-├── samconfig.toml         # SAM configuration
-└── README.md
+├── samconfig.toml         # SAM configuration  
+├── README.md     
+└── Test_README.md
 ```
 
 ## 🚀 Deployment
@@ -124,32 +124,32 @@ The application uses the following environment variables:
 
 ## 🔧 How It Works
 
-### 1. **Web Scraping (Scraper Function)**
+### 1. **Web Scraping (Scraper Lambda Function)**
 - Uses Playwright to scrape AWS blogs
 - Extracts posts for a specific date (default: previous day)
 - Stores raw blog post data in DynamoDB
 - Handles pagination and dynamic content loading
 
-### 2. **Categorization (Categorizer Function)**
+### 2. **Categorization (Categorizer Lambda Function)**
 - **URL-based**: Extracts category from blog URL path
-- **AI-powered(IAM issue: Account needed to raise a support ticket for CreateModelInvocationJob Authorization job )**: Uses Amazon Bedrock (Amazon Nova Pro Model) for intelligent categorization
+- **AI-powered(Not complete - IAM issue*: Account needed to raise a support ticket for CreateModelInvocationJob Authorization job )**: Uses Amazon Bedrock (Amazon Nova Pro Model) for intelligent categorization
 - Supports batch processing for multiple posts using batch inference
 - Updates posts with category information
 
-### 3. **Notification (Notifier Function)**
+### 3. **Notification (Notifier Lambda Function)**
 - Retrieves categorized posts for a date
 - Matches posts with user subscriptions
 - Sends personalized emails using SMTP
 - Handles error notifications via SNS
 
-### 4. **Subscription Management**
-- Direct API Gateway to DynamoDB integration
-- RESTful API for user subscription management
-- Input validation and CORS support
+### 4. **Subscription Lambda Function**
+- Exposes an API using Lambda Function URL with CORS enabled
+- Validates input
+- Stores subcriber data in DynamoDB
 
-## 📊 Database Schema
+## 📊 DynamoDB Database Schema
 
-### Posts Table (`suo-aws-posts`)
+### Posts Table
 ```json
 {
   "id": "string (UUID)",
@@ -164,7 +164,7 @@ The application uses the following environment variables:
 }
 ```
 
-### Users Table (`aws-suo-users`)
+### Users Table
 ```json
 {
   "id": "string (UUID)",
@@ -176,7 +176,7 @@ The application uses the following environment variables:
 }
 ```
 
-### Categories Table (`suo-categories`)
+### Categories Table
 ```json
 {
   "id": "string (UUID)",
@@ -188,6 +188,13 @@ The application uses the following environment variables:
 ## 🔌 API Usage
 
 ### Subscribe to Categories
+
+You can go through the website or use cURL.
+
+#### Website
+https://suo-aws.vercel.app/
+
+#### Curl command
 ```bash
 curl -X POST https://pn9va5qd7k.execute-api.us-east-1.amazonaws.com/prod/subscribe \
   -H "Content-Type: application/json" \
@@ -200,29 +207,9 @@ curl -X POST https://pn9va5qd7k.execute-api.us-east-1.amazonaws.com/prod/subscri
 
 ### Manual Function Invocation
 
-**Scraper Function:**
-```bash
-aws lambda invoke \
-  --function-name suo-aws-scraper \
-  --payload '{"target_date": "06/25/2025"}' \
-  response.json
-```
+ Please refer to the README.md file
+- **[TEST ReadMe file](./Test_README.md)** - For manual testing guide
 
-**Categorizer Function:**
-```bash
-aws lambda invoke \
-  --function-name suo-aws-categorizer \
-  --payload '{"target_date": "06/25/2025"}' \
-  response.json
-```
-
-**Notifier Function:**
-```bash
-aws lambda invoke \
-  --function-name suo-aws-notifier \
-  --payload '{}' \
-  response.json
-```
 
 ## 🎯 AWS Service Categories
 
@@ -230,7 +217,7 @@ The system recognizes these AWS service categories:
 - `architecture`, `mt`, `gametech`, `aws-insights`, `awsmarketplace`, `big-data`
 - `compute`, `containers`, `database`, `desktop-and-application-streaming`, `developer`, `devops`, `mobile` 
 - `networking-and-content-delivery`, `opensource`,`machine-learning`, `media`, `quantum-computing`, `robotics`
-- `awsforsap`, `security`, `spatial`, `startups`, `storage`, `supply-chain`, `training-and-certification`
+- `awsforsap`, `security`, `startups`, `storage`, `supply-chain`, `training-and-certification`
 - And many more ...
 
 ## 🔍 Monitoring & Troubleshooting
