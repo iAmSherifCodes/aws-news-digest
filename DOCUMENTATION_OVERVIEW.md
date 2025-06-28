@@ -22,7 +22,7 @@ Visit the website here: [Link](https://suo-aws.vercel.app/)
 
 ## Testing Documentation
  Please refer to the README.md file
-- **[./Manual_README.md](./Manual_README.md)** - Manual Testing guide
+- **[./Manual_README.md](./Test_README.md)** - Manual Testing guide
 
 
 ### Function Documentation
