@@ -92,16 +92,14 @@ suo-aws/
    sam deploy --guided
    ```
 
-6. **Deploy the subscription API (optional)**
+6. **Deploy the subscription function directly from the Console(optional)**
    ```bash
-   cd functions/subscribe
-   ./deploy-direct-integration.sh
+   cd functions/subscription
    ```
   
 7. **Deploy the Categorizer Function directly from the Console**
    ```bash
    cd functions/categorizer
-   ./deploy-direct-integration.sh
    ```
 
 ### Environment Variables
@@ -110,9 +108,9 @@ The application uses the following environment variables:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `POSTS_TABLE` | DynamoDB table for blog posts | `suo-aws-posts` |
-| `USERS_TABLE` | DynamoDB table for users | `aws-suo-users` |
-| `CATEGORIES_TABLE` | DynamoDB table for categories | `suo-categories` |
+| `POSTS_TABLE` | DynamoDB table for blog posts | - |
+| `USERS_TABLE` | DynamoDB table for users | - |
+| `CATEGORIES_TABLE` | DynamoDB table for categories | - |
 | `GENAI_MODEL` | Enable AI categorization | `false` |
 | `BEDROCK_MODEL_ID` | Bedrock model for AI | `amazon.nova-pro-v1:0` |
 | `EMAIL_USER` | SMTP username | - |
