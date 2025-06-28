@@ -13,6 +13,8 @@ SUO-AWS is a serverless AWS news subscription platform that:
 3. **Notifies** subscribed users via personalized emails (Google mail only- for now)
 4. **Manages** subscriptions through a serverless API
 
+Visit the website here: [Link](https://suo-aws.vercel.app/)
+
 ## 📋 Documentation Files
 
 ### Main Documentation
