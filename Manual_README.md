@@ -18,20 +18,14 @@ The workflow normally runs daily, but you can test it manually by sending a requ
 POST https://90kdndeozk.execute-api.us-east-1.amazonaws.com/dev/start-workflow
 ```
 
-### Test Dates
- Please note that each of the date cannot be used twice.
- - `06/23/2025`
- - `06/24/2025`
- - `06/25/2025`
-
 ### Request Body
 
 The API accepts a JSON body with an optional field:
 
 | Field        | Type   | Description                          |
 |--------------|--------|--------------------------------------|
-| `target-date`| string | (Optional) Format: `MM/DD/YYYY`. If not provided, the system defaults to **yesterday**. |
-
+| `target_date`| string | (Optional) Format: `MM/DD/YYYY`. If not provided, the system defaults to **yesterday**. |
+> Note: The `target_date` value should the present date or day before. 
 #### Example Payload
 
 ```json
