@@ -3,9 +3,9 @@ const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb')
 const { SNSClient, PublishCommand } = require('@aws-sdk/client-sns');
 const sendEmail = require('./mail_setup').sendEmail;
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION });
+const client = new DynamoDBClient({ region: 'us-east-1' });
 const dynamodb = DynamoDBDocumentClient.from(client);
-const sns = new SNSClient({ region: process.env.AWS_REGION });
+const sns = new SNSClient({ region: 'us-east-1' });
 
 const POSTS_TABLE = process.env.POSTS_TABLE;
 const USERS_TABLE = process.env.USERS_TABLE;
@@ -38,9 +38,11 @@ async function getSubscribedUsers(categories) {
         }));
         
         const users = response.Items || [];
+        console.log('Users:', users);
         
         // Extract category names from category objects
         const categoryNames = categories.map(cat => cat.categories || []).flat();
+        // console.log('CategoriesNames:', categoryNames);
 
         const subscribedUsers = users.filter(user => {
             const userCategories = user.categories || [];
@@ -157,13 +159,15 @@ exports.handler = async (event, context) => {
     console.log('Starting notification process');
     
     try {
-        let date = event.target_date;
+        // check if target_date is in event if not use getPreviousDate
+        let date = JSON.parse(event.body.target_date);
         if (!date) {
             date = getPreviousDate();
         }
         console.log('Fetching posts for date:', date);
         
-        const posts = await getPostsByDate(date);       
+        const posts = await getPostsByDate(date); 
+        console.log('Posts:', posts.length);      
         if (!posts || posts.length === 0) {
             return {
                 statusCode: 404,
@@ -172,10 +176,13 @@ exports.handler = async (event, context) => {
         }
 
         const categories = await getCategoriesByDate(date);
+        // console.log('Categories:', categories);
 
         const subscribedUsers = await getSubscribedUsers(categories);
+        // console.log('Subscribed users:', subscribedUsers.length);
 
         await sendCategorizedNewsToSubscribers(posts, subscribedUsers);
+        // console.log('Notifications sent to all subscribed users');
         
         return {
             statusCode: 200,
@@ -194,3 +201,10 @@ exports.handler = async (event, context) => {
     }
 };
 
+// For local testing
+// if (require.main === module) {
+//     const testEvent = {
+//         post_id: '670729a3-71dd-4519-8719-ee201a1812b2'
+//     };
+//     exports.handler(testEvent, null).then(console.log);
+// }
