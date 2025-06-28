@@ -20,6 +20,11 @@ Visit the website here: [Link](https://suo-aws.vercel.app/)
 ### Main Documentation
 - **[README.md](./README.md)** - Main project documentation with architecture overview, deployment instructions, and usage examples
 
+## Testing Documentation
+ Please refer to the README.md file
+- **[./Manual_README.md](./Manual_README.md)** - Manual Testing guide
+
+
 ### Function Documentation
 - **[functions/scraper/README.md](./functions/scraper/README.md)** - Web scraping function using Playwright
 - **[functions/categorizer/README.md](./functions/categorizer/README.md)** - AI/URL-based categorization function
