@@ -71,7 +71,7 @@ Visit the website here: [Link](https://suo-aws.vercel.app/)
 - **Output**: Email notifications to subscribed users
 
 ### Subscribe API
-- **Type**: API Gateway + DynamoDB
+- **Type**: Lambda Function Url + Lambda + DynamoDB
 - **No Lambda**: Direct integration for cost efficiency
 - **Key Features**: Request validation, CORS support, error handling
 - **Output**: User subscription records
@@ -95,13 +95,6 @@ Each function includes monitoring guidance for:
 - **S3**: $1-2 (batch processing)
 - **Total**: ~$20-55/month
 
-### Cost Reduction Strategies
-- Use URL categorization instead of AI for cost savings
-- Implement user engagement tracking
-- Archive old posts to reduce storage costs
-- Optimize Lambda memory allocation
-- Use reserved capacity for predictable workloads
-
 ## 🚀 Deployment Environments
 
 ### Development
@@ -123,12 +116,6 @@ Each function includes monitoring guidance for:
 - DynamoDB throughput: On-demand (auto-scaling)
 - API Gateway: 10,000 requests/second
 - Bedrock: Model-specific quotas
-
-### Scaling Strategies
-- Implement reserved concurrency for critical functions
-- Use DynamoDB Global Tables for multi-region
-- Add CloudFront for API caching
-- Consider Step Functions for complex workflows
 
 ## 📞 Support & Troubleshooting
 
