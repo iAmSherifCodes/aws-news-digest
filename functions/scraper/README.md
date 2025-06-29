@@ -188,7 +188,4 @@ playwright==1.45.0
 - Pagination iterations performed
 - Browser initialization time
 
-### Alarms
-- Function errors > 5% error rate
-- Function duration > 4 minutes
-- DynamoDB throttling events
+*Built with ❤️ using AWS Serverless technologies*
