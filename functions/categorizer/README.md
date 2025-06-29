@@ -118,6 +118,9 @@ AI-powered categorization using Amazon Bedrock batch inference.
 
 ### Manual Invocation
 
+ Please refer to the README.md file
+- **[TEST ReadMe file](../../Test_README.md)** - For manual testing guide.
+
 **URL-Based Categorization:**
 ```bash
 aws lambda invoke \
@@ -312,3 +315,5 @@ Focus on the key announcements, features, or changes described.
 - Use URL-based for standard posts
 - Use AI-powered for complex or ambiguous content
 - Implement confidence scoring for automatic mode selection
+
+*Built with ❤️ using AWS Serverless technologies*
