@@ -31,6 +31,13 @@ async def get_blog_posts_for_date(target_date: str, url: str) -> list[dict[str, 
     async with BlogScraper(target_date=target_date) as scraper:
         return await scraper.get_blog_posts_for_date(url)
 
+# write a function that fecthes blog posts from a dynamodb table for a given date
+
+def get_posts_by_date(date: str) -> list[dict[str, str]]:
+    response = posts_table.query(
+        KeyConditionExpression=boto3.dynamodb.conditions.Key('date').eq(date)
+    )
+    return response.get('Items', [])
 
 def save_posts_to_dynamodb(posts):
     with posts_table.batch_writer() as batch:
@@ -61,6 +68,17 @@ def lambda_handler(event, context):
         else:
             logger.info("No target date provided, using previous date")
             target_date = get_previous_date()
+        
+        existing_posts = get_posts_by_date(target_date)
+        if existing_posts:
+            logger.info(f"Found {len(existing_posts)} existing posts for the target date: {target_date}")
+            return {
+                'statusCode': 200,
+                'body': json.dumps({
+                    'message': f'Found {len(existing_posts)} existing posts for the target date: {target_date}',
+                    'posts': existing_posts
+                })
+            }
         blog_posts = asyncio.run(get_blog_posts_for_date(target_date=target_date, url=AWS_BLOG_URL))
         logger.info("Finished AWS Blog scraper")
         if not blog_posts:
