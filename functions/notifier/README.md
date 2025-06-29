@@ -235,3 +235,5 @@ SUO-AWS Daily News: 12/15/2024
 - Email delivery failures
 - DynamoDB throttling events
 - SNS delivery failures
+
+*Built with ❤️ using AWS Serverless technologies*
