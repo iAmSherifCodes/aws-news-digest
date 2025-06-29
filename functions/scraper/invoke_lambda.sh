@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Variables
-FUNCTION_NAME="scraper_lambda"
+FUNCTION_NAME="scraper_lambda_1"
 
 echo "Invoking Lambda function..."
 # Create the payload with formatted JSON
