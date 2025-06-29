@@ -23,7 +23,7 @@ SUO-AWS (Stay Updated On AWS) is built using a serverless architecture with the 
  
 ## Manual Testing
  Please refer to the README.md file
-- **[TEST ReadMe file](./Test_README.md)** - Manual Testing guide
+- **[TEST ReadMe file](./Test_README.md)** - For manual testing guide.
 
 ## 📁 Project Structure
 
