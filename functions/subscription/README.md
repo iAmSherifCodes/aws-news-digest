@@ -116,3 +116,5 @@ The function handles various error scenarios:
 
 - `@aws-sdk/client-dynamodb`: DynamoDB client
 - `@aws-sdk/lib-dynamodb`: Document client for simplified operations
+
+*Built with ❤️ using AWS Serverless technologies*
