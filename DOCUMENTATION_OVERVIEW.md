@@ -18,11 +18,11 @@ Visit the website here: [Link](https://suo-aws.vercel.app/)
 ## 📋 Documentation Files
 
 ### Main Documentation
-- **[README.md](./README.md)** - Main project documentation with architecture overview, deployment instructions, and usage examples
+- **[README.md](./README.md)** - Main project documentation with architecture overview, deployment instructions, and usage examples.
 
 ## Testing Documentation
  Please refer to the README.md file
-- **[./Manual_README.md](./Test_README.md)** - Manual Testing guide
+- **[Test README.md](./Test_README.md)** - For manual testing guide.
 
 
 ### Function Documentation
@@ -139,3 +139,5 @@ Each function includes monitoring guidance for:
 ---
 
 *This documentation provides comprehensive coverage of the SUO-AWS platform. Each function's README contains detailed technical information, while this overview provides quick reference and architectural understanding.*
+
+*Built with ❤️ using AWS Serverless technologies*
