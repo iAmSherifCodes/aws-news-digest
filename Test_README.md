@@ -7,10 +7,10 @@ This API allows you to manually trigger our workflow which performs:
 2. 🗂 **Categorizing** the news  
 3. 📣 **Notifying** subscribed users
 
-The workflow normally runs daily, but you can test it manually by sending a request with a specific date.
+The workflow normally runs daily, but you can test it manually by the API.
 
 ### Prerequisites
-- Ensure that you have subscribed on [SUO-AWS website]()
+- Ensure that you have subscribed on [SUO-AWS website](https://suo-aws.vercel.app/)
 
 ### 🔗 API Endpoint
 
@@ -21,14 +21,12 @@ POST https://90kdndeozk.execute-api.us-east-1.amazonaws.com/dev/start-workflow
 ### Request Body
 
 The API accepts an empty JSON body.
-By default, the system processes news from yesterday, ensuring that subscribed users receive updates from the previous day.
+By default, the system processes news from yesterday, ensuring that subscribed users receive latest updates from the previous day.
 
 #### Example Payload
 
 ```json
-{
-  "target-date": "06/25/2025"
-}
+{}
 ```
 
 ### Test with `curl`
@@ -38,7 +36,7 @@ You can test the API using the terminal:
 ```bash
 curl -X POST https://90kdndeozk.execute-api.us-east-1.amazonaws.com/dev/start-workflow \
   -H "Content-Type: application/json" \
-  -d '{"target-date": "06/25/2025"}'
+  -d '{}'
 ```
 
 
@@ -63,9 +61,7 @@ curl -X POST https://90kdndeozk.execute-api.us-east-1.amazonaws.com/dev/start-wo
    * Paste this:
 
    ```json
-   {
-     "target-date": "06/25/2025"
-   }
+   {}
    ```
 
 6. Click **Send**
