@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Variables
-ROLE_NAME="LambdaScraperRole"
+ROLE_NAME="LambdaScraperRole1"
 POLICY_NAME="${ROLE_NAME}Policy"
 AWS_REGION="us-east-1"
 DYNAMODB_TABLE="suo-aws-posts"
@@ -40,6 +40,9 @@ cat > lambda-policy.json << EOF
       "Effect": "Allow",
       "Action": [
         "dynamodb:PutItem",
+        "dynamodb:GetItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
         "dynamodb:BatchWriteItem"
       ],
       "Resource": "arn:aws:dynamodb:*:*:table/${DYNAMODB_TABLE}"
