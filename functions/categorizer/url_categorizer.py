@@ -1,7 +1,7 @@
 import os
 
 def get_category_from_url(posts):
-    base_url = os.environ.get('AWS_BLOGS_BASE_URL', 'https://aws.amazon.com/blogs/')
+    base_url = os.environ.get('AWS_BLOGS_BASE_URL')
     unknown_category = os.environ.get('UNKNOWN_CATEGORY', 'unknown')
     categories = set()
     for post in posts:
