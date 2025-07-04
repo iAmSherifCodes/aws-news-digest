@@ -2,6 +2,9 @@ const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb');
 const { SNSClient, PublishCommand } = require('@aws-sdk/client-sns');
 const sendEmail = require('./mail_setup').sendEmail;
+const fs = require('fs');
+const path = require('path');
+const Handlebars = require('handlebars');
 
 const client = new DynamoDBClient({ region: 'us-east-1' });
 const dynamodb = DynamoDBDocumentClient.from(client);
@@ -134,9 +137,12 @@ async function sendCategorizedNewsToSubscribers(posts, subscribers) {
         ).join('\n');
 
         const subject = `SUO-AWS Daily News: ${matchedNews[0].date}`;
-        const html = matchedNews.map(news =>
-            `<li><strong>${news.title}</strong><br>${news.description}<br><a href="${news.url}">Read more</a></li>`
-        ).join('');
+        
+        // Load and compile HTML template
+        const templatePath = path.join(__dirname, 'email-template.html');
+        const templateSource = fs.readFileSync(templatePath, 'utf8');
+        const template = Handlebars.compile(templateSource);
+        const html = template({ news: matchedNews });
         
         await sendEmail('SUO AWS NEWS', FROM_EMAIL, subscriber.name, subscriber.email, subject, text, html)
         }
