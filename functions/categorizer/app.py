@@ -13,12 +13,12 @@ logger = logging.getLogger()
 logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
 # Get region from environment or default to us-east-1
-AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
+AWS_REGION = os.environ.get('AWS_REGION')
 
 # Initialize clients - create them only when needed
 dynamodb = None
-posts_table_name = os.environ.get('POSTS_TABLE', 'suo-aws-posts')
-categories_table_name = os.environ.get('CATEGORIES_TABLE', 'suo-categories')
+posts_table_name = os.environ.get('POSTS_TABLE')
+categories_table_name = os.environ.get('CATEGORIES_TABLE')
 bedrock_runtime = None
 
 # Bedrock model ID - using same model for both operations
