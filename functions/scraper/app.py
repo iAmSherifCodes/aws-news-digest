@@ -31,11 +31,9 @@ async def get_blog_posts_for_date(target_date: str, url: str) -> list[dict[str, 
     async with BlogScraper(target_date=target_date) as scraper:
         return await scraper.get_blog_posts_for_date(url)
 
-# write a function that fecthes blog posts from a dynamodb table for a given date
-
 def get_posts_by_date(date: str) -> list[dict[str, str]]:
-    response = posts_table.query(
-        KeyConditionExpression=boto3.dynamodb.conditions.Key('date').eq(date)
+    response = posts_table.scan(
+        FilterExpression=boto3.dynamodb.conditions.Attr('date').eq(date)
     )
     return response.get('Items', [])
 
