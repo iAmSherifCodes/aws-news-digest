@@ -10,17 +10,16 @@ from botocore.exceptions import ClientError
 logger = logging.getLogger()
 logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
-# Get region from environment or default to us-east-1
-AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
+AWS_REGION = os.environ.get('AWS_REGION')
 
 # Initialize clients
 dynamodb = None
-posts_table_name = os.environ.get('POSTS_TABLE', 'suo-aws-posts')
+posts_table_name = os.environ.get('POSTS_TABLE')
 bedrock = None
 s3 = None
 
 # Bedrock model ID for batch inference
-NOVA_MODEL = os.environ.get('BEDROCK_MODEL_ID', 'amazon.nova-lite-v1:0')
+NOVA_MODEL = os.environ.get('BEDROCK_MODEL_ID')
 
 # S3 configuration
 def get_bucket_name():
@@ -516,7 +515,7 @@ def run_batch_inference(date=None, limit=100):
         logger.error(f"Error in batch inference: {str(e)}")
         return {"error": str(e)}
 
-if __name__ == "__main__":
-    # Test batch inference
-    result = run_batch_inference(date="06/19/2025", limit=10)
-    print(json.dumps(result, indent=2))
+# if __name__ == "__main__":
+#     # Test batch inference
+#     result = run_batch_inference(date="06/19/2025", limit=10)
+#     print(json.dumps(result, indent=2))
